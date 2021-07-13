@@ -1,3 +1,6 @@
+// import configurationService from "../service/configuration.service";
+const { configurationService } = require('../service/configuration.service')
+
 // exports.post = (req, res, next) => {
 //     res.status(201).send('Requisição recebida com sucesso!');
 // };
@@ -13,6 +16,16 @@
 // };
 
 exports.getExport = (req, res, next) => {
-    console.log("Export action received")
-    res.status(201).send('Requisição recebida com sucesso!');
+
+    const configurationId = req.params.id
+    configurationService.getById(configurationId)
+        .then(response => {
+            console.log("Configuration to export: " + JSON.stringify(response))
+            res.status(201)
+                .send('Requisição recebida com sucesso!');
+        })
+        .catch(error => {
+            console.log("Failed to get configuration. " + JSON.stringify(error))
+            res.status(502)
+        })
 };

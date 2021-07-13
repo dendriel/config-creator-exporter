@@ -6,6 +6,6 @@ const controller = require('../controller/configurationController')
 // router.put('/:id', controller.put);
 // router.delete('/:id', controller.delete);
 
-router.get('/export', controller.getExport);
+router.get('/export/:id', controller.getExport);
 
 module.exports = router;
