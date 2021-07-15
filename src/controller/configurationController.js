@@ -20,12 +20,12 @@ exports.getExport = (req, res, next) => {
     const configurationId = req.params.id
     configurationService.getById(configurationId)
         .then(response => {
-            console.log("Configuration to export: " + JSON.stringify(response))
+            console.log("Configuration to export: " + JSON.stringify(response.data))
             res.status(201)
                 .send('Requisição recebida com sucesso!');
         })
         .catch(error => {
-            console.log("Failed to get configuration. " + JSON.stringify(error))
+            console.log("Failed to get configuration. " + error.message)
             res.status(502)
         })
 };

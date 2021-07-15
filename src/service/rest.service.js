@@ -6,9 +6,11 @@ let urls = {
     production: 'https://your-production-url.com/'
 }
 
+const authKey = process.env.AUTH_KEY
 const axiosInstance = Axios.create({
     baseURL: urls[process.env.NODE_ENV],
     headers: {
+        'Authorization': 'Bearer ' + authKey,
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
