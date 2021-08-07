@@ -41,11 +41,16 @@ const save = (path, data) => {
     return saveRequest(path, data)
 }
 
+const patch = (path, data) => {
+    return axiosInstance.patch(path, data)
+}
+
 exports.restService = {
     api: axiosInstance,
     getById: getById,
     getAll: getAll,
     count: count,
     removeById: removeById,
-    save: save
+    save: save,
+    patch: patch
 }

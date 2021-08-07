@@ -1,6 +1,8 @@
 const { configurationService } = require('../service/configuration.service')
 const { resourceService } = require('../service/resource.service')
+const { storageService } = require('../service/storage.service')
 
+const TARGET_DIRECTORY_NAME = 'CONFIG_CREATOR_EXPORTED_CONFIGURATIONS'
 
 class Result extends Error {
     constructor(status, message) {
@@ -24,17 +26,27 @@ function getConfiguration(configId) {
 function getResources(config) {
     return resourceService.getAll(config.projectId)
         .then(response => {
-            const resources = response.data;
-            return resources.map(r => {
-                return {
-                    ...r,
-                    data: JSON.parse(r.data)
-                }
+            const resources = response.data.map(r => {
+                    return {
+                        ...r,
+                        data: JSON.parse(r.data)
+                    }
             })
+
+            return {
+                config: config,
+                resources: resources
+            }
         })
 }
-function createDataWrapper(resources) {
-    return Promise.resolve({ data: {}, resources: resources})
+
+function createDataWrapper(target) {
+    return Promise.resolve({
+        data: {},
+        config: target.config,
+        resources: target.resources,
+        targetDirectory: {}
+    })
 }
 
 function parseItemValue(item) {
@@ -96,15 +108,40 @@ function parseCollections(wrapper) {
     return Promise.resolve(wrapper)
 }
 
-function printData(wrapper) {
-    console.log(JSON.stringify(wrapper.data))
+function getTargetDirectory(wrapper) {
+    return storageService.directory.getByName(TARGET_DIRECTORY_NAME)
+        .then(response => {
+            wrapper.targetDirectory = response.data
+            return wrapper
+        })
+}
+
+function upload(wrapper) {
+    return storageService.resource.upload("EXPORTED", wrapper.targetDirectory.id, wrapper.data)
+        .then(response => {
+            console.log("DONE: " + JSON.stringify(response.data))
+            let resource = response.data;
+            return {
+                id: wrapper.config.id,
+                state: 'READY',
+                resourceId: resource.id
+            }
+        })
+}
+
+function updateConfig(data) {
+    return configurationService.patch(data)
+        .then(() => {
+            console.log("DONE!")
+        })
 }
 
 function handleError(result, res) {
     if (!result.code) {
-        throw result
+        return res.status(500).send()
     }
-    res.status(result.code).send(result.message)
+    console.log(res.statusMessage)
+    return res.status(result.code).end()
 }
 
 exports.getExport = (req, res, next) => {
@@ -115,10 +152,13 @@ exports.getExport = (req, res, next) => {
         .then(createDataWrapper)
         .then(parseItems)
         .then(parseCollections)
-        .then(printData)
-        .catch(result => {
-            handleError(result, res)
+        .then(getTargetDirectory)
+        .then(upload)
+        .then(updateConfig)
+        .then(() => {
+            return res.status(200).send()
         })
-
-    res.status(200).send()
+        .catch(result => {
+            return handleError(result, res)
+        })
 };
