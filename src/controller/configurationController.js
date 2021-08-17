@@ -132,10 +132,11 @@ function upload(wrapper) {
 function updateConfig(data) {
     return configurationService.patch(data)
         .then(() => {
-            console.log("DONE!")
+            console.log("Configuration successfully updated!")
         })
 }
 
+// TODO: Improve error handling by handling each specific error on place.
 function handleError(result, res) {
     if (!result.code) {
         return res.status(500).send()
@@ -162,3 +163,14 @@ exports.getExport = (req, res, next) => {
             return handleError(result, res)
         })
 };
+
+exports.getExportHandler = (configId) => {
+    return getConfiguration(configId)
+        .then(getResources)
+        .then(createDataWrapper)
+        .then(parseItems)
+        .then(parseCollections)
+        .then(getTargetDirectory)
+        .then(upload)
+        .then(updateConfig)
+}
