@@ -1,8 +1,8 @@
 const Axios = require('axios')
 
 let urls = {
-    test: `http://localhost:8081`,
-    development: 'http://localhost:8081/',
+    test: `http://localhost`,
+    development: 'http://localhost/',
     production: 'https://your-production-url.com/'
 }
 

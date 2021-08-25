@@ -15,8 +15,14 @@ function getConfiguration(configId) {
     return configurationService.getById(configId)
         .then(response => {
             const config = response.data
-            if (config.state !== 'REQUESTED') {
-                throw new Result(409, 'Requisição já processada!')
+            if (response.status !== 200) {
+                throw new Result(response.status, 'Failed to retrieve configuration!')
+            }
+            else if (config.state && config.state !== 'REQUESTED') {
+                throw new Result(409, 'Configuration already generated!')
+            }
+            else if (!config.state) {
+                throw new Result(500, 'Failed to retrieve configuration!')
             }
 
             return config
@@ -37,6 +43,10 @@ function getResources(config) {
                 config: config,
                 resources: resources
             }
+        })
+        .catch(error => {
+            console.log('Failed to get resources. '  + error)
+            throw new Result(500, `Failed to get resources. ${error}`)
         })
 }
 
@@ -145,6 +155,11 @@ function handleError(result, res) {
     return res.status(result.code).end()
 }
 
+function catchError(result, configId) {
+    return updateConfig({ id: configId, state: 'FAILED'})
+        .then(() => handleError(result, res))
+}
+
 exports.getExport = (req, res, next) => {
 
     const configId = req.params.id
@@ -159,9 +174,7 @@ exports.getExport = (req, res, next) => {
         .then(() => {
             return res.status(200).send()
         })
-        .catch(result => {
-            return handleError(result, res)
-        })
+        .catch(result => catchError(result, configId))
 };
 
 exports.getExportHandler = (configId) => {
@@ -173,4 +186,5 @@ exports.getExportHandler = (configId) => {
         .then(getTargetDirectory)
         .then(upload)
         .then(updateConfig)
+        .catch(result => catchError(result, configId))
 }

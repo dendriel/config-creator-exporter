@@ -1,6 +1,6 @@
 const { restService } = require('./rest.service')
 
-const path = "/configuration"
+const path = "/rest/configuration"
 
 
 exports.configurationService = {

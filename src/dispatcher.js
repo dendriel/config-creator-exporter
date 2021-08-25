@@ -19,7 +19,6 @@ const app = Consumer.create({
                 console.log(`Message ${body.id} successfully processed.`)
             })
             .catch(error => {
-                console.log(`Failed to process message ${body.id}. ` + error)
                 throw new Error(`Failed to process message ${body.id}. ` + error)
             })
     },
@@ -34,6 +33,4 @@ app.on('processing_error', (err) => {
     console.error("processing_error: " + err.message)
 });
 
-app.start();
-
-console.log("Running dispatcher...")
+module.exports = app;
