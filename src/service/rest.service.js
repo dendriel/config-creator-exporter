@@ -1,14 +1,12 @@
 const Axios = require('axios')
 
-let urls = {
-    test: `http://localhost`,
-    development: 'http://localhost/',
-    production: 'https://your-production-url.com/'
-}
+const basePath = '/rest'
 
+const restUrl = process.env.SERVICE_URL || 'http://localhost'
 const authKey = process.env.AUTH_KEY
+
 const axiosInstance = Axios.create({
-    baseURL: urls[process.env.NODE_ENV],
+    baseURL: restUrl,
     headers: {
         'Authorization': 'Bearer ' + authKey,
         'Accept': 'application/json',
@@ -17,19 +15,19 @@ const axiosInstance = Axios.create({
 });
 
 const getById = (path, id) => {
-    return axiosInstance.get(path + "/" + id)
+    return axiosInstance.get(basePath + path + "/" + id)
 }
 
 const getAll = (path, offset, limit) => {
-    return axiosInstance.get(path + "/all?limit=" + limit + "&offset=" + offset)
+    return axiosInstance.get(basePath + path + "/all?limit=" + limit + "&offset=" + offset)
 }
 
 const removeById = (path, id) => {
-    return axiosInstance.delete(path + "/" + id)
+    return axiosInstance.delete(basePath + path + "/" + id)
 }
 
 const count = (path) => {
-    return axiosInstance.get(path + "/count")
+    return axiosInstance.get(basePath + path + "/count")
 }
 
 const getSaveRequest = (template) => {
@@ -42,11 +40,12 @@ const save = (path, data) => {
 }
 
 const patch = (path, data) => {
-    return axiosInstance.patch(path, data)
+    return axiosInstance.patch(basePath + path, data)
 }
 
 exports.restService = {
     api: axiosInstance,
+    basePath: basePath,
     getById: getById,
     getAll: getAll,
     count: count,
