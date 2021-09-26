@@ -2,7 +2,7 @@ const { configurationService } = require('./service/configuration.service')
 const { resourceService } = require('./service/resource.service')
 const { storageService } = require('./service/storage.service')
 
-const TARGET_DIRECTORY_NAME = 'CONFIG_CREATOR_EXPORTED_CONFIGURATIONS'
+const TARGET_DIRECTORY_NAME = process.env.TARGET_DIR || 'CONFIG_CREATOR_EXPORTED_CONFIGURATIONS'
 
 class Result extends Error {
     constructor(status, message) {
@@ -130,7 +130,7 @@ function getTargetDirectory(wrapper) {
         })
         .catch(error => {
             console.log('Failed to get target directory. ' + error)
-            throw new Result(500, `Failed to get target directory. ${error}`)
+            throw new Result(500, `Failed to get target directory ${TARGET_DIRECTORY_NAME}. ${error}`)
         })
 }
 
