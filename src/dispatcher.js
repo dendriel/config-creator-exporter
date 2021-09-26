@@ -14,7 +14,7 @@ const app = Consumer.create({
         console.log("Message received\n" + JSON.stringify(message))
         const body = JSON.parse(message.Body)
         console.log("Process message: " + body.id)
-        getExportHandler(body.id)
+        getExportHandler(body)
             .then(() => {
                 console.log(`Message ${body.id} successfully processed.`)
             })

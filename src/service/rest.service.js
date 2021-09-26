@@ -3,7 +3,7 @@ const Axios = require('axios')
 const basePath = '/rest'
 
 const restUrl = process.env.SERVICE_URL || 'http://localhost'
-const authKey = process.env.AUTH_KEY
+const authKey = process.env.SERVICE_AUTH_KEY
 
 const axiosInstance = Axios.create({
     baseURL: restUrl,

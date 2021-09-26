@@ -27,6 +27,10 @@ function getConfiguration(configId) {
 
             return config
         })
+        .catch(error => {
+            console.log('Failed to get configuration by ID. '  + error)
+            throw new Result(500, `Failed to get configuration. ${error}`)
+        })
 }
 
 function getResources(config) {
@@ -124,6 +128,10 @@ function getTargetDirectory(wrapper) {
             wrapper.targetDirectory = response.data
             return wrapper
         })
+        .catch(error => {
+            console.log('Failed to get target directory. ' + error)
+            throw new Result(500, `Failed to get target directory. ${error}`)
+        })
 }
 
 function upload(wrapper) {
@@ -137,6 +145,10 @@ function upload(wrapper) {
                 resourceId: resource.id
             }
         })
+        .catch(error => {
+            console.log('Failed to upload exported configuration. '  + error)
+            throw new Result(500, `Failed to upload exported configuration. ${error}`)
+        })
 }
 
 function updateConfig(data) {
@@ -144,20 +156,30 @@ function updateConfig(data) {
         .then(() => {
             console.log("Configuration successfully updated!")
         })
+        .catch(error => {
+            console.log('Failed to update configuration. '  + error)
+            throw new Result(500, `Failed to update configuration. ${error}`)
+        })
 }
 
 // TODO: Improve error handling by handling each specific error on place.
-function handleError(result, res) {
-    if (!result.code) {
+function handleError(reason, res) {
+    console.log(`Error: ${reason}`)
+
+    if (!res) {
+        throw new Error(`Error: ${reason}`)
+        return;
+    }
+
+    if (!reason) {
         return res.status(500).send()
     }
-    console.log(res.statusMessage)
-    return res.status(result.code).end()
+    return res.status(500).end()
 }
 
-function catchError(result, configId) {
+function catchError(reason, configId, res) {
     return updateConfig({ id: configId, state: 'FAILED'})
-        .then(() => handleError(result, res))
+        .then(() => handleError(reason, res))
 }
 
 exports.getExport = (req, res, next) => {
@@ -174,10 +196,11 @@ exports.getExport = (req, res, next) => {
         .then(() => {
             return res.status(200).send()
         })
-        .catch(result => catchError(result, configId))
+        .catch(reason => catchError(reason, configId, res))
 };
 
-exports.getExportHandler = (configId) => {
+exports.getExportHandler = (event) => {
+    const configId = event.id
     return getConfiguration(configId)
         .then(getResources)
         .then(createDataWrapper)
@@ -186,5 +209,5 @@ exports.getExportHandler = (configId) => {
         .then(getTargetDirectory)
         .then(upload)
         .then(updateConfig)
-        .catch(result => catchError(result, configId))
+        .catch(reason => catchError(reason, configId))
 }

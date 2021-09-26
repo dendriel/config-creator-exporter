@@ -1,24 +1,12 @@
 const FormData = require('form-data')
 const fs = require('fs')
-const Axios = require('axios')
+const { restService } = require('./rest.service')
 const tmp = require('tmp')
 
 const basePath = "/storage"
 
-const storageUrl = process.env.SERVICE_URL || 'http://localhost'
-const authKey = process.env.AUTH_KEY
-
-const axiosInstance = Axios.create({
-    baseURL: storageUrl,
-    headers: {
-        'Authorization': 'Bearer ' + authKey,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    }
-});
-
 const getByName = (name) => {
-    return axiosInstance.get(basePath + '/directory/find?name=' + name)
+    return restService.api.get(basePath + '/directory/find?name=' + name)
 }
 
 const upload = (name, directoryId, data) => {
@@ -38,7 +26,7 @@ const upload = (name, directoryId, data) => {
     formData.append('file',  fs.createReadStream(tmpObj.name));
 
     // TODO: remove temp file
-    return axiosInstance.post(basePath + '/resource/upload', formData, { headers: formData.getHeaders()})
+    return restService.api.post(basePath + '/resource/upload', formData, { headers: formData.getHeaders()})
 }
 
 exports.storageService = {
