@@ -1,6 +1,6 @@
 const { Consumer } = require('sqs-consumer');
 const AWS = require('aws-sdk');
-const { getExportHandler } = require('./controller/configurationController')
+const { exportConfiguration } = require('./lambda/exporter-handler')
 
 const queueURL = process.env.QUEUE_URL || "http://localhost:9324/queue/export-request"
 
@@ -14,7 +14,7 @@ const app = Consumer.create({
         console.log("Message received\n" + JSON.stringify(message))
         const body = JSON.parse(message.Body)
         console.log("Process message: " + body.id)
-        getExportHandler(body)
+        exportConfiguration(body)
             .then(() => {
                 console.log(`Message ${body.id} successfully processed.`)
             })

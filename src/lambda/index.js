@@ -1,4 +1,4 @@
-const { getExportHandler } = require('./controller/configurationController')
+const { exportConfiguration } = require('./exporter-handler')
 
 exports.handler = async (event) => {
     console.log(JSON.stringify(event))
@@ -7,17 +7,16 @@ exports.handler = async (event) => {
     let errorCount = 0
 
     event.Records.forEach(r => {
-        console.log(JSON.stringify(r))
-        const msg = JSON.parse(r.body)
-        console.log(`Processing configuration id: ${msg.id}`)
+        const data = JSON.parse(r.body)
+        console.log(`Exporting configuration ${data.id}`)
 
-        const promise = getExportHandler(msg)
+        const promise = exportConfiguration(data)
             .then(() => {
-                console.log(`Message ${msg.id} successfully processed.`)
+                console.log(`Configuration ${data.id} successfully exported.`)
             })
             .catch(error => {
                 errorCount++
-                throw new Error(`Failed to process message ${msg.id}. ` + error)
+                throw new Error(`Failed to export configuration ${data.id}. ` + error)
             })
 
         promises.push(promise)
@@ -29,7 +28,7 @@ exports.handler = async (event) => {
         console.log("All configurations exported successfully")
     }
     else {
-        console.log(`Failed to export ${errorCount} configurations of ${event.Records.length}`)
+        console.log(`Failed to export ${errorCount} configurations of ${event.Records.length} requests.`)
     }
 
     return { statusCode: 200 };

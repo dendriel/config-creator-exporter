@@ -9,7 +9,6 @@
   "author": "Vitor Rozsa",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.995.0",
     "axios": "^0.21.4",
     "form-data": "^4.0.0",
     "sqs-consumer": "^5.6.0",

@@ -4,8 +4,14 @@ Configuration Exporter service from Config Creator solution
 
 # Running locally
 
+Setup
 ```shell
-node server.js
+npm start
+```
+
+Start
+```shell
+npm start
 ```
 
 

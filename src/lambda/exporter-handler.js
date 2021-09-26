@@ -1,6 +1,6 @@
-const { configurationService } = require('../service/configuration.service')
-const { resourceService } = require('../service/resource.service')
-const { storageService } = require('../service/storage.service')
+const { configurationService } = require('./service/configuration.service')
+const { resourceService } = require('./service/resource.service')
+const { storageService } = require('./service/storage.service')
 
 const TARGET_DIRECTORY_NAME = 'CONFIG_CREATOR_EXPORTED_CONFIGURATIONS'
 
@@ -199,7 +199,7 @@ exports.getExport = (req, res, next) => {
         .catch(reason => catchError(reason, configId, res))
 };
 
-exports.getExportHandler = (event) => {
+exports.exportConfiguration = (event) => {
     const configId = event.id
     return getConfiguration(configId)
         .then(getResources)
