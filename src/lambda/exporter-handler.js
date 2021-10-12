@@ -182,23 +182,6 @@ function catchError(reason, configId, res) {
         .then(() => handleError(reason, res))
 }
 
-exports.getExport = (req, res, next) => {
-
-    const configId = req.params.id
-    getConfiguration(configId)
-        .then(getResources)
-        .then(createDataWrapper)
-        .then(parseItems)
-        .then(parseCollections)
-        .then(getTargetDirectory)
-        .then(upload)
-        .then(updateConfig)
-        .then(() => {
-            return res.status(200).send()
-        })
-        .catch(reason => catchError(reason, configId, res))
-};
-
 exports.exportConfiguration = (event) => {
     const configId = event.id
     return getConfiguration(configId)

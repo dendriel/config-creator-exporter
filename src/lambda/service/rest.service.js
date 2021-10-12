@@ -4,11 +4,12 @@ const basePath = '/rest'
 
 const restUrl = process.env.SERVICE_URL || 'http://localhost'
 const authKey = process.env.SERVICE_AUTH_KEY
+const authCookie = process.env.AUTH_COOKIE || 'AUCC'
 
 const axiosInstance = Axios.create({
     baseURL: restUrl,
     headers: {
-        'Authorization': 'Bearer ' + authKey,
+        'Cookie': `${authCookie}=${authKey}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
